@@ -1,3 +1,5 @@
+const { getEnabledCategories } = require('trace_events')
+
 Eos = require('eosjs')
 
 callback = (err, res) => { err ? console.error(err) : console.log(res) }
@@ -41,10 +43,19 @@ async function main() {
     let memo = '111 to 222 1.0000 EOS'
 
     const transaction = await transfer(from, to, amount, memo)
-    console.log("tx ", tx)
 
-    let receipt = await eos_client.getTransaction(tx.transaction_id)
-    console.log("receipt ", receipt)
+    let info = await eos_client.getTransaction(tx.transaction_id)
+
+    const res = {}
+    for (var i in info.traces) {
+        for (var x in info.traces[i].act.authorization) {
+            res['sender'] = info.traces[i].act.authorization[x].actor
+        }
+        res['receiver'] = info.traces[i].receipt.receiver
+        res['smart contract owner'] = info.traces[i].act.account
+        res['message'] = info.traces[i].act.data.memo
+    };
+    console.log("res ", res)
 }
 
 main();
