@@ -10,6 +10,7 @@
     "test": "node src/index.js"
   },
   "dependencies": {
-    "eosjs": "^16.0.8"
+    "eosjs": "^16.0.8",
+    "eosjs-api": "^7.0.4"
   }
 }
