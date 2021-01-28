@@ -1,26 +1,50 @@
-EosApi = require('eosjs-api') // Or EosApi = require('./src')
+Eos = require('eosjs')
 
-// everything is optional
-options = {
+callback = (err, res) => { err ? console.error(err) : console.log(res) }
+
+// Default configuration
+config = {
+    chainId: "2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840", // 32 byte (64 char) hex string
+    keyProvider: ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac'],
+    httpEndpoint: 'https://jungle3.cryptolions.io:443',
+    broadcast: true,
+    verbose: false, // API activity
+    sign: true
+}
+
+eos = Eos(config)
+
+EosApi = require('eosjs-api')
+client_options = {
     httpEndpoint: 'https://jungle3.cryptolions.io:443', // default, null for cold-storage
     verbose: false, // API logging
     fetchConfiguration: {}
 }
 
-eos = EosApi(options)
+eos_client = EosApi(client_options)
 
-// Any API call without a callback parameter will print documentation: description,
-// parameters, return value, and possible errors.  All methods and documentation
-// are created from JSON files in eosjs/json/api/v1..
+const transfer = async (from, to, amount, memo) => {
+    options = {
+        keyProvider: ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac'],
+        authorization: 'spongebob111@active',
+        broadcast: true,
+        sign: true
+    }
+    tx = await eos.transfer(from, to, amount, memo, options)
+    return tx
+}
 
-// For callbacks instead of Promises provide a callback
-callback = (err, res) => { err ? console.error(err) : console.log(res) }
+async function main() {
+    let from = "spongebob111"
+    let to = 'spongebob222'
+    let amount = '1.0000 EOS'
+    let memo = '111 to 222 1.0000 EOS'
 
-// The server does not expect any parameters only the callback is needed
-eos.getInfo(callback)
+    const transaction = await transfer(from, to, amount, memo)
+    console.log("tx ", tx)
 
-// Parameters are added before the callback
-eos.getBlock(1, callback)
+    let receipt = await eos_client.getTransaction(tx.transaction_id)
+    console.log("receipt ", receipt)
+}
 
-// Parameters can be an object
-eos.getBlock({ block_num_or_id: 1 }, callback)
+main();
