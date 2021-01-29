@@ -51,12 +51,10 @@ const analyseTransaction = async (txId) => {
     console.log("res ", res)
 }
 
-async function main() {
-    let from = "spongebob111"
-    let to = 'spongebob555'
-    let amount = '1.0000 EOS'
-    let memo = '111 to 555 1.0000 EOS'
+// spongebob111 is a single sig address, it's active permission only relates to one pubkey
+// spongebob555 is a multi sig address, it's active permission relates to 2 pubkeys and threshold is 2
 
+async function main() {
     const singleToMultiTransaction = await transfer(from, to, amount, memo, ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac'], 'spongebob111@active')
 
     await analyseTransaction(singleToMultiTransaction.transaction_id)
@@ -64,7 +62,6 @@ async function main() {
     const MultiToSingleTransaction = await transfer('spongebob555', 'spongebob111', '1.0000 EOS', '555 to 111 1.0000 EOS', ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac', '5JhrWyGS1DbKWsbFgYbHrKA6avkfsr7BZcG5M955KSHcHtdGcZ9'], 'spongebob555@active')
 
     await analyseTransaction(MultiToSingleTransaction.transaction_id)
-
 }
 
 main();
