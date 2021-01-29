@@ -25,10 +25,10 @@ client_options = {
 
 eos_client = EosApi(client_options)
 
-const transfer = async (from, to, amount, memo) => {
+const transfer = async (from, to, amount, memo, keys, authorization) => {
     options = {
-        keyProvider: ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac'],
-        authorization: 'spongebob111@active',
+        keyProvider: keys,
+        authorization: authorization,
         broadcast: true,
         sign: true
     }
@@ -36,15 +36,8 @@ const transfer = async (from, to, amount, memo) => {
     return tx
 }
 
-async function main() {
-    let from = "spongebob111"
-    let to = 'spongebob222'
-    let amount = '1.0000 EOS'
-    let memo = '111 to 222 1.0000 EOS'
-
-    const transaction = await transfer(from, to, amount, memo)
-
-    let info = await eos_client.getTransaction(tx.transaction_id)
+const analyseTransaction = async (txId) => {
+    let info = await eos_client.getTransaction(txId)
 
     const res = {}
     for (var i in info.traces) {
@@ -56,6 +49,22 @@ async function main() {
         res['message'] = info.traces[i].act.data.memo
     };
     console.log("res ", res)
+}
+
+async function main() {
+    let from = "spongebob111"
+    let to = 'spongebob555'
+    let amount = '1.0000 EOS'
+    let memo = '111 to 555 1.0000 EOS'
+
+    const singleToMultiTransaction = await transfer(from, to, amount, memo, ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac'], 'spongebob111@active')
+
+    await analyseTransaction(singleToMultiTransaction.transaction_id)
+
+    const MultiToSingleTransaction = await transfer('spongebob555', 'spongebob111', '1.0000 EOS', '555 to 111 1.0000 EOS', ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac', '5JhrWyGS1DbKWsbFgYbHrKA6avkfsr7BZcG5M955KSHcHtdGcZ9'], 'spongebob555@active')
+
+    await analyseTransaction(MultiToSingleTransaction.transaction_id)
+
 }
 
 main();
