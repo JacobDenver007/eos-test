@@ -1,36 +1,10 @@
-const { getEnabledCategories } = require('trace_events')
+const { eos, eos_client, analyseTransaction } = require("./config")
 
-Eos = require('eosjs')
-
-callback = (err, res) => { err ? console.error(err) : console.log(res) }
-
-// Default configuration
-config = {
-    chainId: "2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840", // 32 byte (64 char) hex string
-    keyProvider: ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac'],
-    httpEndpoint: 'https://jungle3.cryptolions.io:443',
-    broadcast: true,
-    verbose: false, // API activity
-    sign: true
-}
-
-eos = Eos(config)
-
-EosApi = require('eosjs-api')
-client_options = {
-    httpEndpoint: 'https://jungle3.cryptolions.io:443', // default, null for cold-storage
-    verbose: false, // API logging
-    fetchConfiguration: {}
-}
-
-eos_client = EosApi(client_options)
-
-const newAccount = async (accountName, owner, active) => {
-    let config = {
-        keyProvider: ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac'],
-        authorization: 'spongebob111@active',
+const newAccount = async (accountName, owner, active, keys, actor, permission) => {
+    options = {
+        keyProvider: keys,
         broadcast: true,
-        sign: true,
+        sign: true
     }
     tx = await eos.transaction(
         {
@@ -38,11 +12,11 @@ const newAccount = async (accountName, owner, active) => {
                 account: 'eosio',
                 name: 'newaccount',
                 authorization: [{
-                    actor: 'spongebob111',
-                    permission: 'active',
+                    actor: actor,
+                    permission: permission,
                 }],
                 data: {
-                    creator: 'spongebob111',
+                    creator: actor,
                     name: accountName,
                     owner: owner,
                     active: active,
@@ -52,11 +26,11 @@ const newAccount = async (accountName, owner, active) => {
                 account: 'eosio',
                 name: 'buyrambytes',
                 authorization: [{
-                    actor: 'spongebob111',
-                    permission: 'active',
+                    actor: actor,
+                    permission: permission,
                 }],
                 data: {
-                    payer: 'spongebob111',
+                    payer: actor,
                     receiver: accountName,
                     bytes: 8192,
                 },
@@ -65,11 +39,11 @@ const newAccount = async (accountName, owner, active) => {
                 account: 'eosio',
                 name: 'delegatebw',
                 authorization: [{
-                    actor: 'spongebob111',
-                    permission: 'active',
+                    actor: actor,
+                    permission: permission,
                 }],
                 data: {
-                    from: 'spongebob111',
+                    from: actor,
                     receiver: accountName,
                     stake_net_quantity: '1.0000 EOS',
                     stake_cpu_quantity: '1.0000 EOS',
@@ -78,27 +52,12 @@ const newAccount = async (accountName, owner, active) => {
             }]
 
         }
-    )
+        , options)
     return tx
 }
 
-const analyseTransaction = async (txId) => {
-    let info = await eos_client.getTransaction(txId)
-
-    const res = {}
-    for (var i in info.traces) {
-        for (var x in info.traces[i].act.authorization) {
-            res['sender'] = info.traces[i].act.authorization[x].actor
-        }
-        res['receiver'] = info.traces[i].receipt.receiver
-        res['smart contract owner'] = info.traces[i].act.account
-        res['message'] = info.traces[i].act.data.memo
-    };
-    console.log("res ", res)
-}
-
-
 async function main() {
+    let accountName = "spongebob333"
     let owner = {
         threshold: 1,
         keys: [{
@@ -120,8 +79,10 @@ async function main() {
         accounts: [],
         waits: []
     }
-
-    const transaction = await newAccount('spongebob444', owner, active)
+    let keys = ['5KQ1LgoXrSLiUMS8HZp6rSuyyJP5i6jTi1KWbZNerQQLFeTrxac']
+    let actor = 'spongebob111'
+    let permission = 'active'
+    const transaction = await newAccount(accountName, owner, active, keys, actor, permission)
 
     await analyseTransaction(tx.transaction_id)
 }
