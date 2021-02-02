@@ -8,7 +8,8 @@
   "license": "ISC",
   "scripts": {
     "create_account": "node src/account.js",
-    "test": "node src/index.js"
+    "parse_block": "node src/block.js",
+    "tx": "node src/index.js"
   },
   "dependencies": {
     "eosjs": "^16.0.8",

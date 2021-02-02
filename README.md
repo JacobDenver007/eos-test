@@ -38,3 +38,5 @@ config = {
     - keys 交易发送者的私钥
     - authorization 交易发送者授权，格式为 name@permission（eg：spongebob111@active）
 > main 中执行了两次 transfer，第一次是单签向多签账户转账，第二次是多签向单签账户转账，构造时候可以参考现有示例
+
+- 执行 ```yarn tx```

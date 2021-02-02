@@ -13,6 +13,7 @@ eos_client = EosApi(config)
 var analyseTransaction = async (txId) => {
     let info = await eos_client.getTransaction(txId)
 
+    console.log("block_num ", info.block_num)
     const res = {}
     for (var i in info.traces) {
         for (var x in info.traces[i].act.authorization) {
@@ -23,6 +24,7 @@ var analyseTransaction = async (txId) => {
         res['message'] = info.traces[i].act.data.memo
     };
     console.log("res ", res)
+    return res
 }
 
 module.exports = {
