@@ -31,10 +31,10 @@ config = {
 
 - 修改 ```src/index.js``` 文件中的 ```config```
 - 修改 ```main``` 函数中调用 ```transfer``` 的参数改成自己想要的
-> main 中执行了两次 transfer，第一次是单签向多签账户转账，第二次是多签向单签账户转账，构造时候可以参考现有示例
     - from 转账发起方
     - to 转账接收方
     - amount 转账金额
     - memo 转账附加信息
     - keys 交易发送者的私钥
     - authorization 交易发送者授权，格式为 name@permission（eg：spongebob111@active）
+> main 中执行了两次 transfer，第一次是单签向多签账户转账，第二次是多签向单签账户转账，构造时候可以参考现有示例
